@@ -12,7 +12,7 @@ import {
 } from '../../../admin/client/App/elemental';
 import _ from 'lodash';
 
-function compareValues (current, next) {
+function compareValues(current, next) {
 	const currentLength = current ? current.length : 0;
 	const nextLength = next ? next.length : 0;
 	if (currentLength !== nextLength) return false;
@@ -29,24 +29,24 @@ module.exports = Field.create({
 		type: 'Relationship',
 	},
 
-	getInitialState () {
+	getInitialState() {
 		return {
 			value: null,
 			createIsOpen: false,
 		};
 	},
 
-	componentDidMount () {
+	componentDidMount() {
 		this._itemsCache = {};
 		this.loadValue(this.props.value);
 	},
 
-	componentWillReceiveProps (nextProps) {
-		if (nextProps.value === this.props.value || nextProps.many && compareValues(this.props.value, nextProps.value)) return;
+	componentWillReceiveProps(nextProps) {
+		//if (nextProps.value === this.props.value || nextProps.many && compareValues(this.props.value, nextProps.value)) return;
 		this.loadValue(nextProps.value);
 	},
 
-	shouldCollapse () {
+	shouldCollapse() {
 		if (this.props.many) {
 			// many:true relationships have an Array for a value
 			return this.props.collapse && !this.props.value.length;
@@ -54,9 +54,8 @@ module.exports = Field.create({
 		return this.props.collapse && !this.props.value;
 	},
 
-	buildFilters () {
+	buildFilters() {
 		var filters = {};
-
 		_.forEach(this.props.filters, (value, key) => {
 			if (typeof value === 'string' && value[0] === ':') {
 				var fieldName = value.slice(1);
@@ -78,7 +77,7 @@ module.exports = Field.create({
 		}, this);
 
 		var parts = [];
-
+		if (filters != {});
 		_.forEach(filters, function (val, key) {
 			parts.push('filters[' + key + '][value]=' + encodeURIComponent(val));
 		});
@@ -86,12 +85,12 @@ module.exports = Field.create({
 		return parts.join('&');
 	},
 
-	cacheItem (item) {
+	cacheItem(item) {
 		item.href = Keystone.adminPath + '/' + this.props.refList.path + '/' + item.id;
 		this._itemsCache[item.id] = item;
 	},
 
-	loadValue (values) {
+	loadValue(values) {
 		if (!values) {
 			return this.setState({
 				loading: false,
@@ -131,7 +130,8 @@ module.exports = Field.create({
 
 	// NOTE: this seems like the wrong way to add options to the Select
 	loadOptionsCallback: {},
-	loadOptions (input, callback) {
+	loadOptions(input, callback) {
+		console.log('load options');
 		// NOTE: this seems like the wrong way to add options to the Select
 		this.loadOptionsCallback = callback;
 		const filters = this.buildFilters();
@@ -144,6 +144,8 @@ module.exports = Field.create({
 				return callback(null, []);
 			}
 			data.results.forEach(this.cacheItem);
+			if (this.props.forceReload && this.props.onForceReload)
+				this.props.onForceReload(null); // reset force reload ref to prevent redudant network calls
 			callback(null, {
 				options: data.results,
 				complete: data.results.length === data.count,
@@ -151,26 +153,27 @@ module.exports = Field.create({
 		});
 	},
 
-	valueChanged (value) {
+	valueChanged(value) {
 		this.props.onChange({
 			path: this.props.path,
 			value: value,
+			forceReloadRef: this.props.refList.path
 		});
 	},
 
-	openCreate () {
+	openCreate() {
 		this.setState({
 			createIsOpen: true,
 		});
 	},
 
-	closeCreate () {
+	closeCreate() {
 		this.setState({
 			createIsOpen: false,
 		});
 	},
 
-	onCreate (item) {
+	onCreate(item) {
 		this.cacheItem(item);
 		if (Array.isArray(this.state.value)) {
 			// For many relationships, append the new item to the end
@@ -187,17 +190,21 @@ module.exports = Field.create({
 			options: Object.keys(this._itemsCache).map((k) => this._itemsCache[k]),
 		});
 		this.closeCreate();
+		this.props.onForceReload(this.props.refList.path);
 	},
 
-	renderSelect (noedit) {
+	renderSelect(noedit) {
+		if (this.props.forceReload)
+			console.log(this.props.label + ': FORCE RELOAD');
 		return (
 			<div>
 				{/* This input element fools Safari's autocorrect in certain situations that completely break react-select */}
-				<input type="text" style={{ position: 'absolute', width: 1, height: 1, zIndex: -1, opacity: 0 }} tabIndex="-1"/>
+				<input type="text" style={{ position: 'absolute', width: 1, height: 1, zIndex: -1, opacity: 0 }} tabIndex="-1" />
 				<Select.Async
 					multi={this.props.many}
 					disabled={noedit}
 					loadOptions={this.loadOptions}
+					forceReload={this.props.forceReload}
 					labelKey="name"
 					name={this.getInputName(this.props.path)}
 					onChange={this.valueChanged}
@@ -209,7 +216,8 @@ module.exports = Field.create({
 		);
 	},
 
-	renderInputGroup () {
+	renderInputGroup() {
+
 		// TODO: find better solution
 		//   when importing the CreateForm using: import CreateForm from '../../../admin/client/App/shared/CreateForm';
 		//   CreateForm was imported as a blank object. This stack overflow post suggested lazilly requiring it:
@@ -233,7 +241,7 @@ module.exports = Field.create({
 		);
 	},
 
-	renderValue () {
+	renderValue() {
 		const { many } = this.props;
 		const { value } = this.state;
 		const props = {
@@ -246,7 +254,7 @@ module.exports = Field.create({
 		return many ? this.renderSelect(true) : <FormInput {...props} />;
 	},
 
-	renderField () {
+	renderField() {
 		if (this.props.createInline) {
 			return this.renderInputGroup();
 		} else {

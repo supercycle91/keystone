@@ -23,15 +23,22 @@ module.exports = function (req, res) {
 		try { filters = JSON.parse(req.query.filters); }
 		catch (e) { } // eslint-disable-line no-empty
 	}
-	if (typeof filters === 'object') {
-		assign(where, req.list.addFiltersToQuery(filters));
-	}
+	// if (typeof filters === 'object') {
+	// 	assign(where, req.list.addFiltersToQuery(filters));
+	// }
+
 	if (req.query.search) {
 		assign(where, req.list.addSearchToQuery(req.query.search));
 	}
 	var query = req.list.model.find(where);
 	if (req.query.populate) {
 		query.populate(req.query.populate);
+	}
+	if (typeof filters === 'object') {
+		Object.keys(filters).forEach(key => {
+			let filterItems = filters[key].value.split(',');
+			query.where(key).in(filterItems)
+		});
 	}
 	if (req.query.expandRelationshipFields && req.query.expandRelationshipFields !== 'false') {
 		req.list.relationshipFields.forEach(function (i) {
@@ -53,6 +60,7 @@ module.exports = function (req, res) {
 			query.find();
 			query.limit(Number(req.query.limit) || 100);
 			query.skip(Number(req.query.skip) || 0);
+
 			if (sort.string) {
 				query.sort(sort.string);
 			}

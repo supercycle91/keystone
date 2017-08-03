@@ -4,7 +4,7 @@ import React, { Component, PropTypes } from 'react';
 import classes from './styles';
 
 class FormSelect extends Component {
-	render () {
+	render() {
 		const { children, id, options, ...props } = this.props;
 		const { formFieldId } = this.context;
 

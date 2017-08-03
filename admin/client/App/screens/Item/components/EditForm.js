@@ -26,7 +26,7 @@ import { deleteItem } from '../actions';
 
 import { upcase } from '../../../../utils/string';
 
-function getNameFromData (data) {
+function getNameFromData(data) {
 	if (typeof data === 'object') {
 		if (typeof data.first === 'string' && typeof data.last === 'string') {
 			return data.first + ' ' + data.last;
@@ -37,11 +37,11 @@ function getNameFromData (data) {
 	return data;
 }
 
-function smoothScrollTop () {
+function smoothScrollTop() {
 	if (document.body.scrollTop || document.documentElement.scrollTop) {
 		window.scrollBy(0, -50);
 		var timeOut = setTimeout(smoothScrollTop, 20);
-	}	else {
+	} else {
 		clearTimeout(timeOut);
 	}
 }
@@ -52,22 +52,23 @@ var EditForm = React.createClass({
 		data: React.PropTypes.object,
 		list: React.PropTypes.object,
 	},
-	getInitialState () {
+	getInitialState() {
 		return {
 			values: assign({}, this.props.data.fields),
 			confirmationDialog: null,
 			loading: false,
 			lastValues: null, // used for resetting
 			focusFirstField: !this.props.list.nameField && !this.props.list.nameFieldIsFormHeader,
+			forceReloadRef: null
 		};
 	},
-	componentDidMount () {
+	componentDidMount() {
 		this.__isMounted = true;
 	},
-	componentWillUnmount () {
+	componentWillUnmount() {
 		this.__isMounted = false;
 	},
-	getFieldProps (field) {
+	getFieldProps(field) {
 		const props = assign({}, field);
 		const alerts = this.state.alerts;
 		// Display validation errors inline
@@ -79,49 +80,58 @@ var EditForm = React.createClass({
 				props.isValid = false;
 			}
 		}
+		if (props.refList && this.state.forceReloadRef === props.refList.path) {
+			props.forceReload = true;
+			this.setState({ forceReloadRef: null });
+		}
+
 		props.value = this.state.values[field.path];
 		props.values = this.state.values;
 		props.onChange = this.handleChange;
+		props.onForceReload = this.handleForceReload;
 		props.mode = 'edit';
+
 		return props;
 	},
-	handleChange (event) {
+	handleChange(event) {
 		const values = assign({}, this.state.values);
 
 		values[event.path] = event.value;
 		this.setState({ values });
 	},
-
-	toggleDeleteDialog () {
+	handleForceReload(forceReloadRef) {
+		this.setState({ forceReloadRef });
+	},
+	toggleDeleteDialog() {
 		this.setState({
 			deleteDialogIsOpen: !this.state.deleteDialogIsOpen,
 		});
 	},
-	toggleResetDialog () {
+	toggleResetDialog() {
 		this.setState({
 			resetDialogIsOpen: !this.state.resetDialogIsOpen,
 		});
 	},
-	handleReset () {
+	handleReset() {
 		this.setState({
 			values: assign({}, this.state.lastValues || this.props.data.fields),
 			resetDialogIsOpen: false,
 		});
 	},
-	handleDelete () {
+	handleDelete() {
 		const { data } = this.props;
 		this.props.dispatch(deleteItem(data.id, this.props.router));
 	},
-	handleKeyFocus () {
+	handleKeyFocus() {
 		const input = this.refs.keyOrIdInput;
 		input.select();
 	},
-	removeConfirmationDialog () {
+	removeConfirmationDialog() {
 		this.setState({
 			confirmationDialog: null,
 		});
 	},
-	updateItem () {
+	updateItem() {
 		const { data, list } = this.props;
 		const editForm = this.refs.editForm;
 		const formData = new FormData(editForm);
@@ -156,7 +166,7 @@ var EditForm = React.createClass({
 			}
 		});
 	},
-	renderKeyOrId () {
+	renderKeyOrId() {
 		var className = 'EditForm__key-or-id';
 		var list = this.props.list;
 
@@ -195,7 +205,7 @@ var EditForm = React.createClass({
 			);
 		}
 	},
-	renderNameField () {
+	renderNameField() {
 		var nameField = this.props.list.nameField;
 		var nameFieldIsFormHeader = this.props.list.nameFieldIsFormHeader;
 		var wrapNameField = field => (
@@ -222,9 +232,8 @@ var EditForm = React.createClass({
 			);
 		}
 	},
-	renderFormElements () {
+	renderFormElements() {
 		var headings = 0;
-
 		return this.props.list.uiElements.map((el, index) => {
 			// Don't render the name field if it is the header since it'll be rendered in BIG above
 			// the list. (see renderNameField method, this is the reverse check of the one it does)
@@ -255,7 +264,7 @@ var EditForm = React.createClass({
 			}
 		}, this);
 	},
-	renderFooterBar () {
+	renderFooterBar() {
 		if (this.props.list.noedit && this.props.list.nodelete) {
 			return null;
 		}
@@ -300,7 +309,7 @@ var EditForm = React.createClass({
 			</FooterBar>
 		);
 	},
-	renderTrackingMeta () {
+	renderTrackingMeta() {
 		// TODO: These fields are visible now, so we don't want this. We may revisit
 		// it when we have more granular control over hiding fields in certain
 		// contexts, so I'm leaving this code here as a reference for now - JW
@@ -368,7 +377,7 @@ var EditForm = React.createClass({
 			</div>
 		) : null;
 	},
-	render () {
+	render() {
 		return (
 			<form ref="editForm" className="EditForm-container">
 				{(this.state.alerts) ? <AlertMessages alerts={this.state.alerts} /> : null}

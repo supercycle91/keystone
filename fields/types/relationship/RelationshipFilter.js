@@ -106,11 +106,14 @@ var RelationshipFilter = React.createClass({
 	loadSearchResults (thenPopulateValue) {
 		const searchString = this.state.searchString;
 		const filters = this.buildFilters();
+
+		console.log('load search', searchString)
 		xhr({
 			url: Keystone.adminPath + '/api/' + this.props.field.refList.path + '?basic&search=' + searchString + '&' + filters,
 			responseType: 'json',
 		}, (err, resp, data) => {
 			if (err) {
+				debugger;
 				// TODO: Handle errors better
 				console.error('Error loading items:', err);
 				this.setState({

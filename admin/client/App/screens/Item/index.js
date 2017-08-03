@@ -32,12 +32,12 @@ var ItemView = React.createClass({
 	contextTypes: {
 		router: React.PropTypes.object.isRequired,
 	},
-	getInitialState () {
+	getInitialState() {
 		return {
 			createIsOpen: false,
 		};
 	},
-	componentDidMount () {
+	componentDidMount() {
 		// When we directly navigate to an item without coming from another client
 		// side routed page before, we need to select the list before initializing the item
 		// We also need to update when the list id has changed
@@ -46,7 +46,7 @@ var ItemView = React.createClass({
 		}
 		this.initializeItem(this.props.params.itemId);
 	},
-	componentWillReceiveProps (nextProps) {
+	componentWillReceiveProps(nextProps) {
 		// We've opened a new item from the client side routing, so initialize
 		// again with the new item id
 		if (nextProps.params.itemId !== this.props.params.itemId) {
@@ -55,12 +55,12 @@ var ItemView = React.createClass({
 		}
 	},
 	// Initialize an item
-	initializeItem (itemId) {
+	initializeItem(itemId) {
 		this.props.dispatch(selectItem(itemId));
 		this.props.dispatch(loadItemData());
 	},
 	// Called when a new item is created
-	onCreate (item) {
+	onCreate(item) {
 		// Hide the create form
 		this.toggleCreateModal(false);
 		// Redirect to newly created item path
@@ -68,13 +68,13 @@ var ItemView = React.createClass({
 		this.context.router.push(`${Keystone.adminPath}/${list.path}/${item.id}`);
 	},
 	// Open and close the create new item modal
-	toggleCreateModal (visible) {
+	toggleCreateModal(visible) {
 		this.setState({
 			createIsOpen: visible,
 		});
 	},
 	// Render this items relationships
-	renderRelationships () {
+	renderRelationships() {
 		const { relationships } = this.props.currentList;
 		const keys = Object.keys(relationships);
 		if (!keys.length) return;
@@ -104,7 +104,7 @@ var ItemView = React.createClass({
 		);
 	},
 	// Handle errors
-	handleError (error) {
+	handleError(error) {
 		const detail = error.detail;
 		if (detail) {
 			// Item not found
@@ -142,7 +142,7 @@ var ItemView = React.createClass({
 			</Container>
 		);
 	},
-	render () {
+	render() {
 		// If we don't have any data yet, show the loading indicator
 		if (!this.props.ready) {
 			return (
