@@ -81,8 +81,7 @@ var EditForm = React.createClass({
 			}
 		}
 		if (props.refList && this.state.forceReloadRef === props.refList.path) {
-			props.forceReload = true;
-			this.setState({ forceReloadRef: null });
+			props.toggleReload = true;
 		}
 
 		props.value = this.state.values[field.path];
@@ -90,7 +89,6 @@ var EditForm = React.createClass({
 		props.onChange = this.handleChange;
 		props.onForceReload = this.handleForceReload;
 		props.mode = 'edit';
-
 		return props;
 	},
 	handleChange(event) {
@@ -100,6 +98,7 @@ var EditForm = React.createClass({
 		this.setState({ values });
 	},
 	handleForceReload(forceReloadRef) {
+		console.log('handle force reload EDIT FORM')
 		this.setState({ forceReloadRef });
 	},
 	toggleDeleteDialog() {

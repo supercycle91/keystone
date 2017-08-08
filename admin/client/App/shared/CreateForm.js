@@ -20,13 +20,14 @@ const CreateForm = React.createClass({
 		onCancel: React.PropTypes.func,
 		onCreate: React.PropTypes.func,
 	},
-	getDefaultProps () {
+	getDefaultProps() {
 		return {
 			err: null,
 			isOpen: false,
+			forceReloadRef: null
 		};
 	},
-	getInitialState () {
+	getInitialState() {
 		// Set the field values to their default values when first rendering the
 		// form. (If they have a default value, that is)
 		var values = {};
@@ -37,40 +38,52 @@ const CreateForm = React.createClass({
 		});
 		return {
 			values: values,
-			alerts: {},
+			alerts: {}
 		};
 	},
-	componentDidMount () {
+	componentDidMount() {
 		document.body.addEventListener('keyup', this.handleKeyPress, false);
 	},
-	componentWillUnmount () {
+	componentWillUnmount() {
 		document.body.removeEventListener('keyup', this.handleKeyPress, false);
 	},
-	handleKeyPress (evt) {
+	handleKeyPress(evt) {
 		if (vkey[evt.keyCode] === '<escape>') {
 			this.props.onCancel();
 		}
 	},
 	// Handle input change events
-	handleChange (event) {
+	handleChange(event) {
 		var values = assign({}, this.state.values);
 		values[event.path] = event.value;
 		this.setState({
 			values: values,
 		});
 	},
+	handleForceReload(forceReloadRef) {
+		console.log('handle force reload CREATE FORM', forceReloadRef)
+		this.setState({ forceReloadRef });
+	},
 	// Set the props of a field
-	getFieldProps (field) {
+	getFieldProps(field) {
 		var props = assign({}, field);
 		props.value = this.state.values[field.path];
 		props.values = this.state.values;
 		props.onChange = this.handleChange;
+		props.anothaTest = 'tasdfasdf';
 		props.mode = 'create';
+		props.onForceReload = this.handleForceReload;
 		props.key = field.path;
+
+		if (props.refList && this.state.forceReloadRef === props.refList.path) {
+			console.log('create form force reload ref', this.state.forceReloadRef);
+			props.toggleReload = true;
+		}
+
 		return props;
 	},
 	// Create a new item when the form is submitted
-	submitForm (event) {
+	submitForm(event) {
 		event.preventDefault();
 		const createForm = event.target;
 		const formData = new FormData(createForm);
@@ -109,7 +122,7 @@ const CreateForm = React.createClass({
 		});
 	},
 	// Render the form itself
-	renderForm () {
+	renderForm() {
 		if (!this.props.isOpen) return;
 
 		var form = [];
@@ -176,7 +189,7 @@ const CreateForm = React.createClass({
 			</Form>
 		);
 	},
-	render () {
+	render() {
 		return (
 			<Modal.Dialog
 				isOpen={this.props.isOpen}

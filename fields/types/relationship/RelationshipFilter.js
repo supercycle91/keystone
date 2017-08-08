@@ -113,7 +113,6 @@ var RelationshipFilter = React.createClass({
 			responseType: 'json',
 		}, (err, resp, data) => {
 			if (err) {
-				debugger;
 				// TODO: Handle errors better
 				console.error('Error loading items:', err);
 				this.setState({

@@ -175,6 +175,7 @@ module.exports = Field.create({
 
 	onCreate(item) {
 		this.cacheItem(item);
+		console.log('relationshipField.js props', this.props);
 		if (Array.isArray(this.state.value)) {
 			// For many relationships, append the new item to the end
 			const values = this.state.value.map((item) => item.id);
@@ -189,12 +190,17 @@ module.exports = Field.create({
 			complete: true,
 			options: Object.keys(this._itemsCache).map((k) => this._itemsCache[k]),
 		});
+
+		if (this.props.onForceReload) {
+			console.log('force reload exists')
+			this.props.onForceReload(this.props.refList.path);
+		} else console.log('--', item)
+
 		this.closeCreate();
-		this.props.onForceReload(this.props.refList.path);
 	},
 
 	renderSelect(noedit) {
-		if (this.props.forceReload)
+		if (this.props.toggleReload)
 			console.log(this.props.label + ': FORCE RELOAD');
 		return (
 			<div>
@@ -204,7 +210,7 @@ module.exports = Field.create({
 					multi={this.props.many}
 					disabled={noedit}
 					loadOptions={this.loadOptions}
-					forceReload={this.props.forceReload}
+					toggleReload={this.props.toggleReload}
 					labelKey="name"
 					name={this.getInputName(this.props.path)}
 					onChange={this.valueChanged}
