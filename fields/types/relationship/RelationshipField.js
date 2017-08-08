@@ -42,7 +42,7 @@ module.exports = Field.create({
 	},
 
 	componentWillReceiveProps(nextProps) {
-		if (nextProps.value === this.props.value || nextProps.many && compareValues(this.props.value, nextProps.value)) return;
+		if (!nextProps.toggleReload && nextProps.value === this.props.value || nextProps.many && compareValues(this.props.value, nextProps.value)) return;
 		this.loadValue(nextProps.value);
 	},
 
@@ -156,7 +156,7 @@ module.exports = Field.create({
 		this.props.onChange({
 			path: this.props.path,
 			value: value,
-			forceReloadRef: this.props.refList.path
+			ref: this.props.refList ? this.props.refList.path : undefined
 		});
 	},
 
@@ -210,6 +210,7 @@ module.exports = Field.create({
 					onChange={this.valueChanged}
 					simpleValue
 					value={this.state.value}
+					cache={null}
 					valueKey="id"
 				/>
 			</div>

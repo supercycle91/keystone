@@ -59,7 +59,8 @@ var EditForm = React.createClass({
 			loading: false,
 			lastValues: null, // used for resetting
 			focusFirstField: !this.props.list.nameField && !this.props.list.nameFieldIsFormHeader,
-			forceReloadRef: null
+			forceReloadRef: null,
+			lastChangedRef: null
 		};
 	},
 	componentDidMount() {
@@ -80,6 +81,16 @@ var EditForm = React.createClass({
 				props.isValid = false;
 			}
 		}
+
+
+		if (props.filters) {
+			let filters = Object.keys(props.filters).forEach(key => {
+				if (props.filters[key].split(':')[1] === this.state.lastChangedRef) {
+					props.toggleReload = true;
+				}
+			});
+		}
+
 		if (props.refList && this.state.forceReloadRef === props.refList.path) {
 			props.toggleReload = true;
 		}
@@ -89,13 +100,13 @@ var EditForm = React.createClass({
 		props.onChange = this.handleChange;
 		props.onForceReload = this.handleForceReload;
 		props.mode = 'edit';
+
 		return props;
 	},
 	handleChange(event) {
 		const values = assign({}, this.state.values);
-
 		values[event.path] = event.value;
-		this.setState({ values });
+		this.setState({ values, lastChangedRef: event.ref });
 	},
 	handleForceReload(forceReloadRef) {
 		this.setState({ forceReloadRef });

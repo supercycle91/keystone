@@ -38,7 +38,8 @@ const CreateForm = React.createClass({
 		});
 		return {
 			values: values,
-			alerts: {}
+			alerts: {},
+			lastChangedRef: null
 		};
 	},
 	componentDidMount() {
@@ -58,6 +59,7 @@ const CreateForm = React.createClass({
 		values[event.path] = event.value;
 		this.setState({
 			values: values,
+			lastChangedRef: event.ref
 		});
 	},
 	handleForceReload(forceReloadRef) {
@@ -73,6 +75,14 @@ const CreateForm = React.createClass({
 		props.mode = 'create';
 		props.onForceReload = this.handleForceReload;
 		props.key = field.path;
+
+		if (props.filters) {
+			let filters = Object.keys(props.filters).forEach(key => {
+				if (props.filters[key].split(':')[1] === this.state.lastChangedRef) {
+					props.toggleReload = true;
+				}
+			});
+		}
 
 		if (props.refList && this.state.forceReloadRef === props.refList.path) {
 			props.toggleReload = true;
