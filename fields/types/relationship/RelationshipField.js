@@ -42,7 +42,7 @@ module.exports = Field.create({
 	},
 
 	componentWillReceiveProps(nextProps) {
-		//if (nextProps.value === this.props.value || nextProps.many && compareValues(this.props.value, nextProps.value)) return;
+		if (nextProps.value === this.props.value || nextProps.many && compareValues(this.props.value, nextProps.value)) return;
 		this.loadValue(nextProps.value);
 	},
 
@@ -131,7 +131,6 @@ module.exports = Field.create({
 	// NOTE: this seems like the wrong way to add options to the Select
 	loadOptionsCallback: {},
 	loadOptions(input, callback) {
-		console.log('load options');
 		// NOTE: this seems like the wrong way to add options to the Select
 		this.loadOptionsCallback = callback;
 		const filters = this.buildFilters();
@@ -175,7 +174,6 @@ module.exports = Field.create({
 
 	onCreate(item) {
 		this.cacheItem(item);
-		console.log('relationshipField.js props', this.props);
 		if (Array.isArray(this.state.value)) {
 			// For many relationships, append the new item to the end
 			const values = this.state.value.map((item) => item.id);
@@ -191,17 +189,13 @@ module.exports = Field.create({
 			options: Object.keys(this._itemsCache).map((k) => this._itemsCache[k]),
 		});
 
-		if (this.props.onForceReload) {
-			console.log('force reload exists')
+		if (this.props.onForceReload)
 			this.props.onForceReload(this.props.refList.path);
-		} else console.log('--', item)
 
 		this.closeCreate();
 	},
 
 	renderSelect(noedit) {
-		if (this.props.toggleReload)
-			console.log(this.props.label + ': FORCE RELOAD');
 		return (
 			<div>
 				{/* This input element fools Safari's autocorrect in certain situations that completely break react-select */}

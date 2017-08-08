@@ -61,7 +61,6 @@ const CreateForm = React.createClass({
 		});
 	},
 	handleForceReload(forceReloadRef) {
-		console.log('handle force reload CREATE FORM', forceReloadRef)
 		this.setState({ forceReloadRef });
 	},
 	// Set the props of a field
@@ -76,7 +75,6 @@ const CreateForm = React.createClass({
 		props.key = field.path;
 
 		if (props.refList && this.state.forceReloadRef === props.refList.path) {
-			console.log('create form force reload ref', this.state.forceReloadRef);
 			props.toggleReload = true;
 		}
 

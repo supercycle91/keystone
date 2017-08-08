@@ -98,7 +98,6 @@ var EditForm = React.createClass({
 		this.setState({ values });
 	},
 	handleForceReload(forceReloadRef) {
-		console.log('handle force reload EDIT FORM')
 		this.setState({ forceReloadRef });
 	},
 	toggleDeleteDialog() {
